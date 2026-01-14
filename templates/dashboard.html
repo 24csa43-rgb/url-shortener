@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📊 Click Analytics Dashboard</h2>
+<h2>💰 Ad Revenue Tracker</h2>
+<p>Clicks: {{ clicks }}</p>
+<p>Impressions: {{ impressions }}</p>
+<p>Total Revenue: ${{ revenue }}</p>
+
+<form method="post">
+    <button type="submit" name="add_click">Add Click</button>
+    <button type="submit" name="add_impression">Add Impression</button>
+    <button type="submit" name="reset">Reset All</button>
+</form>
+
+<hr>
+
+<table>
+    <tr>
+        <th>Short URL</th>
+        <th>Original URL</th>
+        <th>Clicks</th>
+    </tr>
+
+    {% for link in links %}
+    <tr>
+        <td>
+            <a href="/{{ link[0] }}" target="_blank">
+                /{{ link[0] }}
+            </a>
+        </td>
+        <td>{{ link[1] }}</td>
+        <td>{{ link[2] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
