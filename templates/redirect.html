@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script>
+        let timeLeft = 5;
+
+        function countdown() {
+            document.getElementById("timer").innerText = timeLeft;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                document.getElementById("continueBtn").disabled = false;
+                document.getElementById("continueBtn").innerText = "Continue";
+                return;
+            }
+            setTimeout(countdown, 1000);
+        }
+
+        window.onload = countdown;
+    </script>
+</head>
+<body style="text-align:center; margin-top:100px;">
+
+    <h2>Please wait <span id="timer">5</span> seconds</h2>
+
+    <br>
+
+    <button id="continueBtn" disabled
+        onclick="window.location.href='{{ long_url }}'">
+        Wait...
+    </button>
+
+</body>
+</html>
