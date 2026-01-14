@@ -27,6 +27,18 @@
 <body>
 
 <h2>📊 Click Analytics Dashboard</h2>
+<h2>💰 Ad Revenue Tracker</h2>
+<p>Clicks: {{ clicks }}</p>
+<p>Impressions: {{ impressions }}</p>
+<p>Total Revenue: ${{ revenue }}</p>
+
+<form method="post">
+    <button type="submit" name="add_click">Add Click</button>
+    <button type="submit" name="add_impression">Add Impression</button>
+    <button type="submit" name="reset">Reset All</button>
+</form>
+
+<hr>
 
 <table>
     <tr>
