@@ -3,9 +3,11 @@ import sqlite3
 import string
 import random
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
-app.secret_key = "secret123"  # session security
+app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret")
+
 @app.before_request
 def require_login():
     if request.endpoint is None:

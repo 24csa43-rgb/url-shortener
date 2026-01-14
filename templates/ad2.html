@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Advertisement Page 2</title>
-
-    <script>
-        let timeLeft = 5;
-
-        function countdown() {
-            document.getElementById("timer").innerText = timeLeft;
-            timeLeft--;
-
-            if (timeLeft < 0) {
-                document.getElementById("continueBtn").style.display = "inline-block";
-                return;
-            }
-            setTimeout(countdown, 1000);
+    <title>Advertisement</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
         }
-
-        window.onload = countdown;
-    </script>
+        .box {
+            background: #222;
+            padding: 30px;
+            width: 350px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .btn {
+            margin-top: 20px;
+            background: #ff9800;
+            padding: 10px;
+            display: inline-block;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-
-<body style="text-align:center; margin-top:50px;">
-
-    <h2>Advertisement Page 2</h2>
-
-    <!-- AD BLOCK -->
-    <div style="width:300px; height:250px; margin:auto; background:#ddd;">
-        <p>AD SPACE 300x250</p>
+<body>
+    <div class="box">
+        <h3>Advertisement</h3>
+        <p>Your ad content here</p>
+        <a class="btn" href="/ad2">Continue</a>
     </div>
-
-    <p>Please wait <span id="timer">5</span> seconds</p>
-
-    <button id="continueBtn"
-            style="display:none;"
-            onclick="window.location.href='{{ long_url }}'">
-        Continue
-    </button>
-
 </body>
 </html>
