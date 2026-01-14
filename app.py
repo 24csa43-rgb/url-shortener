@@ -4,6 +4,22 @@ import string
 import random
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+def init_db():
+    conn = sqlite3.connect("urls.db")
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS urls (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            original_url TEXT NOT NULL,
+            short_code TEXT UNIQUE NOT NULL,
+            user_id INTEGER,
+            clicks INTEGER DEFAULT 0
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret")
@@ -153,18 +169,27 @@ def get(short_code):
 
 @app.route("/<short_code>")
 def redirect_url(short_code):
-    
-
-
     conn = sqlite3.connect("urls.db")
     c = conn.cursor()
-    c.execute("SELECT long FROM urls WHERE short=?", (short_code,))
+
+    c.execute(
+        "SELECT original_url FROM urls WHERE short_code=?",
+        (short_code,)
+    )
     result = c.fetchone()
-    conn.close()
 
     if result:
-        return redirect(f"/go1/{short_code}")
-    return "URL not found", 404
+        c.execute(
+            "UPDATE urls SET clicks = clicks + 1 WHERE short_code=?",
+            (short_code,)
+        )
+        conn.commit()
+        conn.close()
+        return redirect(result[0])
+    else:
+        conn.close()
+        return "Invalid URL", 404
+
 @app.route("/go1/<short_code>")
 def go1(short_code):
     return redirect(f"/ad1/{short_code}")
@@ -188,6 +213,24 @@ def ad2(short_code):
 def test():
     return "Render deployment works!"
 
+@app.route("/dashboard")
+def dashboard():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("urls.db")
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT short_code, original_url, clicks
+        FROM urls
+        WHERE user_id=?
+    """, (session["user_id"],))
+
+    links = c.fetchall()
+    conn.close()
+
+    return render_template("dashboard.html", links=links)
 
     if __name__ == "__main__":
         app.run(host="0.0.0.0", port=5000, debug=False)
