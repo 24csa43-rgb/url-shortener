@@ -1,64 +1,123 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f8;
-            padding: 30px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background: #667eea;
-            color: white;
-        }
-    </style>
-</head>
-<body>
+{% extends "layout.html" %}
 
-<h2>📊 Click Analytics Dashboard</h2>
-<h2>💰 Ad Revenue Tracker</h2>
-<p>Clicks: {{ clicks }}</p>
-<p>Impressions: {{ impressions }}</p>
-<p>Total Revenue: ${{ revenue }}</p>
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateStats()">
+            Refresh Data Now
+        </button>
+    </div>
+</div>
 
-<form method="post">
-    <button type="submit" name="add_click">Add Click</button>
-    <button type="submit" name="add_impression">Add Impression</button>
-    <button type="submit" name="reset">Reset All</button>
-</form>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3 shadow-sm">
+            <div class="card-header">Total Clicks</div>
+            <div class="card-body">
+                <h3 class="card-title" id="live-clicks">{{ total_clicks }}</h3>
+                <p class="card-text">($0.50 per click)</p>
+            </div>
+        </div>
+    </div>
 
-<hr>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3 shadow-sm">
+            <div class="card-header">Total Impressions</div>
+            <div class="card-body">
+                <h3 class="card-title" id="live-impressions">{{ total_impressions }}</h3>
+                <p class="card-text">($5.00 per 1k views)</p>
+            </div>
+        </div>
+    </div>
 
-<table>
-    <tr>
-        <th>Short URL</th>
-        <th>Original URL</th>
-        <th>Clicks</th>
-    </tr>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3 shadow-sm">
+            <div class="card-header">Total Revenue</div>
+            <div class="card-body">
+                <h3 class="card-title">$<span id="live-revenue">{{ "%.2f"|format(total_revenue) }}</span></h3>
+                <p class="card-text">Estimated Earnings</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    {% for link in links %}
-    <tr>
-        <td>
-            <a href="/{{ link[0] }}" target="_blank">
-                /{{ link[0] }}
-            </a>
-        </td>
-        <td>{{ link[1] }}</td>
-        <td>{{ link[2] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+        Your Active Links
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Short Code</th>
+                        <th>Original URL</th>
+                        <th>Clicks</th>
+                        <th>Impressions</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for url in urls %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('redirect_url', short_code=url.short_code) }}" target="_blank" class="fw-bold text-decoration-none">
+                                {{ request.host_url }}{{ url.short_code }}
+                            </a>
+                        </td>
+                        <td class="text-truncate" style="max-width: 300px;">
+                            <a href="{{ url.original_url }}" target="_blank" class="text-muted">
+                                {{ url.original_url }}
+                            </a>
+                        </td>
+                        <td>{{ url.clicks }}</td>
+                        <td>{{ url.impressions }}</td>
+                        <td>
+                            <a href="{{ url_for('redirect_url', short_code=url.short_code) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                Test Link
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            You haven't created any links yet. <a href="{{ url_for('home') }}">Create one now!</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-</body>
-</html>
+<script>
+    function updateStats() {
+        fetch('/api/stats')
+            .then(response => {
+                if (response.status === 401) {
+                    console.log("User not logged in");
+                    return; 
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    // Update the HTML elements with new numbers
+                    document.getElementById('live-clicks').innerText = data.clicks;
+                    document.getElementById('live-impressions').innerText = data.impressions;
+                    document.getElementById('live-revenue').innerText = data.revenue;
+                    
+                    // Optional: Visual flash effect when data changes
+                    console.log("Stats updated at " + new Date().toLocaleTimeString());
+                }
+            })
+            .catch(error => console.error('Error fetching stats:', error));
+    }
+
+    // Run the update function every 2000 milliseconds (2 seconds)
+    setInterval(updateStats, 2000);
+</script>
+
+{% endblock %}
