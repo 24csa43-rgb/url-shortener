@@ -111,7 +111,7 @@ def home():
     short_url = None
 
     if request.method == "POST":
-        long_url = request.form["long_url"]
+        long_url = request.form["original_url"]
         short_code = generate_short()
 
         conn = sqlite3.connect("urls.db")
