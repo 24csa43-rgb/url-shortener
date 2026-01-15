@@ -1,4 +1,5 @@
 venv/
+urls.db
 __pycache__/
-*.db
+*.pyc
 .env
